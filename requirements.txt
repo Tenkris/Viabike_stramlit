@@ -1,0 +1,9 @@
+pika==1.3.1
+opencv-python==4.7.0.72
+numpy==1.24.3
+torch>=1.8.0  # see https://pytorch.org/get-started/locally (recommended)
+torchvision>=0.9.0
+yolov5==7.0.12
+influxdb-client==1.36.1
+streamlit==1.22.0
+plotly==5.14.1
