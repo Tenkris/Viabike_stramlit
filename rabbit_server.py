@@ -5,6 +5,7 @@ import torch
 import time
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
+import os
 
 # Load YOLOv5 model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
@@ -23,6 +24,9 @@ influxdb_bucket = "bicycle_counts"
 connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
 channel = connection.channel()
 
+output_dir = './output'
+os.makedirs(output_dir, exist_ok=True)
+
 # Declare the queue
 channel.queue_declare(queue=rabbitmq_queue)
 
@@ -39,6 +43,12 @@ def save_to_influxdb(count):
     point = Point("bicycle_count").field("count", count)
     write_api.write(bucket=influxdb_bucket, record=point)
 
+def log_image(image, count):
+    timestamp = int(time.time())
+    filename = f"{output_dir}/image_{timestamp}_{count}_bicycles.jpg"
+    cv2.imwrite(filename, image)
+    print(f"Image saved: {filename}")
+
 # Callback function to handle image data
 def callback(ch, method, properties, body):
     # Convert bytes to numpy array
@@ -54,6 +64,8 @@ def callback(ch, method, properties, body):
     
     # Save count to InfluxDB
     save_to_influxdb(bicycle_count)
+    
+    log_image(image, bicycle_count)
 
 # Start consuming the image data
 channel.basic_consume(queue=rabbitmq_queue, on_message_callback=callback, auto_ack=True)

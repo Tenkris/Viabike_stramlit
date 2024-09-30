@@ -75,7 +75,7 @@ This project implements a system that counts bicycles in images received from a 
 2. In a separate terminal, run the Streamlit app:
 
    ```
-   streamlit run streamlit_app.py
+   streamlit run streamlit-main.py
    ```
 
 3. Open a web browser and navigate to the URL provided by Streamlit (typically `http://localhost:8501`) to view the real-time dashboard.
