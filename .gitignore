@@ -81,3 +81,6 @@ config.local.yaml
 
 # Ignore all files in any directory named temp
 temp/
+
+# ignore folder output
+output/
