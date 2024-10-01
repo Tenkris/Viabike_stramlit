@@ -35,19 +35,17 @@ def get_latest_count():
 def get_historical_data():
     query = f'''
     from(bucket:"{influxdb_bucket}")
-        |> range(start: -5m)
+        |> range(start: -24h)
         |> filter(fn: (r) => r._measurement == "bicycle_count")
     '''
     try:
         result = client.query_api().query_data_frame(query=query)
         if not result.empty:
             result['_time'] = pd.to_datetime(result['_time'])
-            print(" Historical data: ", result[['_time', '_value' , 'publisher_id']])
             return result[['_time', '_value' , 'publisher_id']]
     except Exception as e:
         st.error(f"Error querying InfluxDB: {str(e)}")
-    print(" Historical data: ", result[['_time', '_value' , 'publisher_id']])
-    return pd.DataFrame(columns=['_time', '_value', 'publisher_id'])
+    return pd.DataFrame(columns=['_time', '_value' , 'publisher_id'])
 
 st.title("Real-time Bicycle Count")
 
@@ -60,17 +58,7 @@ historical_data = get_historical_data()
 
 if not historical_data.empty:
     fig = go.Figure()
-
-    # Display different publishers with different colors
-    for publisher_id in historical_data['publisher_id'].unique():
-        publisher_data = historical_data[historical_data['publisher_id'] == publisher_id]
-        fig.add_trace(go.Scatter(
-            x=publisher_data['_time'], 
-            y=publisher_data['_value'], 
-            mode='lines+markers', 
-            name=f"Publisher: {publisher_id}"
-        ))
-
+    fig.add_trace(go.Scatter(x=historical_data['_time'], y=historical_data['_value'], mode='lines+markers'))
     fig.update_layout(title="Bicycle Count Over Time", xaxis_title="Time", yaxis_title="Count")
     st.plotly_chart(fig)
 else:
