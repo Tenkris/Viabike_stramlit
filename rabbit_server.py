@@ -39,8 +39,8 @@ def count_bicycles(image):
     bicycle_results = results.pandas().xyxy[0][results.pandas().xyxy[0]['class'] == 1]
     return len(bicycle_results)
 
-def save_to_influxdb(count):
-    point = Point("bicycle_count").field("count", count)
+def save_to_influxdb(count , publisher_id):
+    point = Point("bicycle_count").field("count", count).tag("publisher_id", publisher_id )
     write_api.write(bucket=influxdb_bucket, record=point)
 
 def log_image(image, count):
@@ -59,11 +59,13 @@ def callback(ch, method, properties, body):
     
     # Count bicycles
     bicycle_count = count_bicycles(image)
+    publisher_id = properties.headers.get('publisher_id', 'Unknown')
+    print(f"Publisher ID: {publisher_id}")
     
     print(f"Number of bicycles detected: {bicycle_count}")
     
     # Save count to InfluxDB
-    save_to_influxdb(bicycle_count)
+    save_to_influxdb(bicycle_count , publisher_id)
     
     log_image(image, bicycle_count)
 
