@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objs as go
 from influxdb_client import InfluxDBClient
 import pandas as pd
+import time 
 
 # InfluxDB connection parameters
 influxdb_url = "http://localhost:8086"
@@ -93,5 +94,7 @@ st.write(f"InfluxDB Bucket: {influxdb_bucket}")
 st.write("Please check your InfluxDB token")
 
 # Auto-refresh the app every 5 seconds
-st.empty()
-st.experimental_rerun()
+# st.empty()
+while True:
+    time.sleep(5)
+    st.experimental_rerun()
