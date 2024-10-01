@@ -35,7 +35,7 @@ def get_latest_count():
 def get_historical_data():
     query = f'''
     from(bucket:"{influxdb_bucket}")
-        |> range(start: -24h)
+        |> range(start: -5m)
         |> filter(fn: (r) => r._measurement == "bicycle_count")
     '''
     try:
