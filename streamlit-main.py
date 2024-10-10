@@ -96,5 +96,5 @@ st.write("Please check your InfluxDB token")
 # Auto-refresh the app every 5 seconds
 # st.empty()
 while True:
-    time.sleep(5)
+    time.sleep(1)
     st.experimental_rerun()
